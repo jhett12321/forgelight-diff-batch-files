@@ -32,6 +32,7 @@ set localeOutput=%toolDataDir%\locale
 rem Special Files Dir
 set luaOutput=%toolDataDir%\lua
 set exeOutput=%toolDataDir%\exe
+set txtOutput=%toolDataDir%\txt
 
 rem Make Required Dirs
 if not exist "%gameDataDir%" mklink /j "%gameDataDir%" "%gameDir%"
@@ -64,6 +65,8 @@ if exist "%luaOutput%" rmdir "%luaOutput%" /s/q
 mkdir "%luaOutput%"
 if exist "%exeOutput%" rmdir "%exeOutput%" /s/q
 mkdir "%exeOutput%"
+if exist "%txtOutput%" rmdir "%txtOutput%" /s/q
+mkdir "%txtOutput%"
 
 echo ---------------------------------------------------------
 echo Started Game Data Analysis.
@@ -121,9 +124,20 @@ echo ---------------------------------------------------------
 		if exist "%exeOutput%\%%~nf.txt" del "%exeOutput%\%%~nf.txt"
 		"%toolsDir%\strings.exe" -a -q -n 6 "%gameDataDir%\%%~nf.exe" >> "%exeOutput%\%%~nf.txt"
 	)
-
+	
 echo ---------------------------------------------------------
 echo Exe Conversion Complete!
+echo Converting txts...
+echo ---------------------------------------------------------
+
+	for %%f in ("%assetOutput%\*.txt") do (
+		copy "%assetOutput%\%%~nf.txt" "%txtOutput%\%%~nf.csv"
+	)
+	
+	"%toolsDir%\fnr.exe" --cl --find "^" --replace "," --dir "%txtOutput%" --fileMask "*.csv"
+
+echo ---------------------------------------------------------
+echo TXT convert Complete!
 echo Game Analysis Complete!
 echo ---------------------------------------------------------
 
