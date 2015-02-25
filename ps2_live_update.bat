@@ -20,6 +20,7 @@ rem Tool Dirs
 set soePackDir=%toolsDir%\soe-pack
 set soeLocaleDir=%toolsDir%\soe-locale
 set unluacDir=%toolsDir%\unluac
+set nconvertDir=%toolsDir%\XnView
 
 rem Asset Dirs
 set manifestOutput=%toolDataDir%\manifests
@@ -31,6 +32,7 @@ set localeOutput=%toolDataDir%\locale
 
 rem Special Files Dir
 set luaOutput=%toolDataDir%\lua
+set ddsOutput=%toolDataDir%\dds
 set exeOutput=%toolDataDir%\exe
 set txtOutput=%toolDataDir%\txt
 
@@ -67,6 +69,23 @@ if exist "%exeOutput%" rmdir "%exeOutput%" /s/q
 mkdir "%exeOutput%"
 if exist "%txtOutput%" rmdir "%txtOutput%" /s/q
 mkdir "%txtOutput%"
+
+if not exist "%ddsOutput%" (
+	mkdir "%ddsOutput%"
+	
+	echo ---------------------------------------------------------
+	echo DDS Files have not been converted yet.
+	echo The tool will now extract all DDS files.
+	echo This is a first time process and may take some time...
+	echo ---------------------------------------------------------
+	
+	for %%f in ("%assetOutput%\*.dds") do (
+		copy "%assetOutput%\%%~nf.dds" "%ddsOutput%\%%~nf.dds"
+		
+		"%nconvertDir%\nconvert.exe" -out png "%ddsOutput%\%%~nf.dds"
+		del "%ddsOutput%\%%~nf.dds"
+	)
+)
 
 echo ---------------------------------------------------------
 echo Started Game Data Analysis.
@@ -118,6 +137,18 @@ echo ---------------------------------------------------------
 	
 echo ---------------------------------------------------------
 echo LUA Conversion Complete!
+echo Converting changed/new DDS Files...
+echo ---------------------------------------------------------
+
+	for %%f in ("%diffOutput%\*.dds") do (
+		copy "%diffOutput%\%%~nf.dds" "%ddsOutput%\%%~nf.dds"
+		
+		"%nconvertDir%\nconvert.exe" -out png "%ddsOutput%\%%~nf.dds"
+		del "%ddsOutput%\%%~nf.dds"
+	)
+
+echo ---------------------------------------------------------
+echo DDS Conversion Complete!
 echo Converting exe's...
 echo ---------------------------------------------------------
 
